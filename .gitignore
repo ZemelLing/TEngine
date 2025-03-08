@@ -13,3 +13,6 @@ Tools/FileServer/AssetRoot
 
 UnityProject/ProjectSettings/CommonBurstAotSettings.json
 UnityProject/ProjectSettings/BurstAotSettings_StandaloneWindows.json
+UnityProject/.vscode/extensions.json
+UnityProject/.vscode/launch.json
+UnityProject/.vscode/settings.json
