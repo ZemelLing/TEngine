@@ -10,7 +10,7 @@ namespace Procedure
 {
     public class ProcedureInitResources : ProcedureBase
     {
-        private bool m_InitResourcesComplete = false;
+        private bool _initResourcesComplete = false;
 
         public override bool UseNativeDialog => true;
 
@@ -18,7 +18,7 @@ namespace Procedure
         {
             base.OnEnter(procedureOwner);
 
-            m_InitResourcesComplete = false;
+            _initResourcesComplete = false;
 
             LauncherMgr.Show(UIDefine.UILoadUpdate, "初始化资源中...");
 
@@ -30,9 +30,17 @@ namespace Procedure
         {
             base.OnUpdate(procedureOwner, elapseSeconds, realElapseSeconds);
 
-            if (!m_InitResourcesComplete)
+            if (!_initResourcesComplete)
             {
                 // 初始化资源未完成则继续等待
+                return;
+            }
+
+            if ((_resourceModule.PlayMode == EPlayMode.HostPlayMode || _resourceModule.PlayMode == EPlayMode.WebPlayMode))
+            {
+                //线上最新版本operation.PackageVersion
+                Log.Debug($"Updated package Version : from {_resourceModule.GetPackageVersion()} to {_resourceModule.PackageVersion}");
+                ChangeState<ProcedureUpdateManifest>(procedureOwner);
                 return;
             }
 
@@ -46,26 +54,22 @@ namespace Procedure
         private IEnumerator InitResources(ProcedureOwner procedureOwner)
         {
             string packageVersion;
-            if (_resourceModule.PlayMode != EPlayMode.HostPlayMode)
+            
+            // 1. 获取资源清单的版本信息
+            var operation1 = _resourceModule.RequestPackageVersionAsync();
+            yield return operation1;
+            if (operation1.Status != EOperationStatus.Succeed)
             {
-                // 2. 获取资源清单的版本信息
-                var operation1 = _resourceModule.RequestPackageVersionAsync();
-                yield return operation1;
-                if (operation1.Status != EOperationStatus.Succeed)
-                {
-                    OnInitResourcesError(procedureOwner);
-                    yield break;
-                }
-    
-                packageVersion = operation1.PackageVersion;
+                OnInitResourcesError(procedureOwner);
+                yield break;
             }
-            else
-            {
-                packageVersion = _resourceModule.PackageVersion;
-            }
+
+            packageVersion = operation1.PackageVersion;
+            _resourceModule.PackageVersion = packageVersion;
+            
             Log.Info($"Init resource package version : {packageVersion}");
             
-            // 3. 传入的版本信息更新资源清单
+            // 2. 传入的版本信息更新资源清单
             var operation = _resourceModule.UpdatePackageManifestAsync(packageVersion);
             yield return operation;
             if (operation.Status != EOperationStatus.Succeed)
@@ -74,7 +78,7 @@ namespace Procedure
                 yield break;
             }
             
-            m_InitResourcesComplete = true;
+            _initResourcesComplete = true;
         }
         
         private void OnInitResourcesError(ProcedureOwner procedureOwner)

@@ -6,8 +6,8 @@ namespace TEngine
     {
         private abstract class ScrollableDebuggerWindowBase : IDebuggerWindow
         {
-            private const float TitleWidth = 240f;
-            private Vector2 m_ScrollPosition = Vector2.zero;
+            private const float TITLE_WIDTH = 240f;
+            private Vector2 _scrollPosition = Vector2.zero;
 
             public virtual void Initialize(params object[] args)
             {
@@ -31,7 +31,7 @@ namespace TEngine
 
             public void OnDraw()
             {
-                m_ScrollPosition = GUILayout.BeginScrollView(m_ScrollPosition);
+                _scrollPosition = GUILayout.BeginScrollView(_scrollPosition);
                 {
                     OnDrawScrollableWindow();
                 }
@@ -44,7 +44,7 @@ namespace TEngine
             {
                 GUILayout.BeginHorizontal();
                 {
-                    GUILayout.Label(title, GUILayout.Width(TitleWidth));
+                    GUILayout.Label(title, GUILayout.Width(TITLE_WIDTH));
                     if (GUILayout.Button(content, "label"))
                     {
                         CopyToClipboard(content);

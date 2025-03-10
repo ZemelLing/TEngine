@@ -1,6 +1,4 @@
-﻿using System;
-using UnityEngine;
-using UnityEngine.Serialization;
+﻿using UnityEngine;
 
 namespace TEngine
 {
@@ -26,16 +24,31 @@ namespace TEngine
             }
         }
 
-        [SerializeField] private AudioSetting audioSetting;
-        
-        [SerializeField] private ProcedureSetting procedureSetting;
+        [SerializeField]
+        private AudioSetting audioSetting;
 
-        [SerializeField] private UpdateSetting updateSetting;
-        
+        [SerializeField]
+        private ProcedureSetting procedureSetting;
+
+        [SerializeField]
+        private UpdateSetting updateSetting;
+
         public static AudioSetting AudioSetting => Instance.audioSetting;
-        
+
         public static ProcedureSetting ProcedureSetting => Instance.procedureSetting;
 
-        public static UpdateSetting UpdateSetting => Instance.updateSetting;
+        public static UpdateSetting UpdateSetting
+        {
+            get
+            {
+#if UNITY_EDITOR
+                if (Instance == null)
+                {
+                    return UnityEditor.AssetDatabase.LoadAssetAtPath<UpdateSetting>("Assets/TEngine/Settings/UpdateSetting.asset");
+                }
+#endif
+                return Instance.updateSetting;
+            }
+        }
     }
 }

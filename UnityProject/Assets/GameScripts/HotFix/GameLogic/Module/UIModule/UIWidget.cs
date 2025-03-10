@@ -78,15 +78,15 @@ namespace GameLogic
             List<UIWidget> listNextUpdateChild = null;
             if (ListChild != null && ListChild.Count > 0)
             {
-                listNextUpdateChild = m_listUpdateChild;
-                var updateListValid = m_updateListValid;
+                listNextUpdateChild = ListUpdateChild;
+                var updateListValid = UpdateListValid;
                 List<UIWidget> listChild = null;
                 if (!updateListValid)
                 {
                     if (listNextUpdateChild == null)
                     {
                         listNextUpdateChild = new List<UIWidget>();
-                        m_listUpdateChild = listNextUpdateChild;
+                        ListUpdateChild = listNextUpdateChild;
                     }
                     else
                     {
@@ -119,7 +119,7 @@ namespace GameLogic
 
                 if (!updateListValid)
                 {
-                    m_updateListValid = true;
+                    UpdateListValid = true;
                 }
             }
 
